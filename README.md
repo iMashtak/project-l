@@ -8,3 +8,4 @@
 - throw
 - assert
 - generics
+- nested classes

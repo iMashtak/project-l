@@ -66,7 +66,7 @@ class JavaMethod(
     var static: Boolean = false,
     var default: Boolean = false,
     var args: MutableList<JavaMethodArg> = ArrayList(),
-    var returns: String = "Object",
+    var returns: String? = null,
     var body: JavaBlockStatement? = null,
     var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
 )

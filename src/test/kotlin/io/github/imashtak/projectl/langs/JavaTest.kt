@@ -33,6 +33,13 @@ class JavaTest {
                     init("\"oops\"")
                 }
 
+                constructor {
+                    arg("x", "ArrayList")
+                    body {
+                        statement("this.x = x")
+                    }
+                }
+
                 method("test") {
                     annotation("Getter") {
                         arg("value", "5")
@@ -41,6 +48,7 @@ class JavaTest {
                         arg("some", "\"another\"")
                     }
                     public()
+                    returns("Object")
                     arg("in", "String")
                     body {
                         `var`("s") { expr("5") }
@@ -104,6 +112,12 @@ class JavaTest {
                 packagePrivate()
                 value("ONE", "\"some\"")
                 field("x") { type("String") }
+                constructor {
+                    arg("x", "String")
+                    body {
+                        statement("this.x = x")
+                    }
+                }
                 method("getX") {
                     public()
                     returns("String")

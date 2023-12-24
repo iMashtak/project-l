@@ -86,6 +86,12 @@ class JavaClassDsl(
         }
         x.annotations.add(javaAnnotationUsage)
     }
+
+    fun constructor(i: JavaMethodDsl.() -> Unit) {
+        val javaMethod = JavaMethod(x.name)
+        JavaMethodDsl(javaMethod, imports).apply(i)
+        x.methods.add(javaMethod)
+    }
 }
 
 @JavaDslMarker
@@ -221,6 +227,12 @@ class JavaEnumDsl(
 
     fun method(method: String, i: JavaMethodDsl.() -> Unit) {
         val javaMethod = JavaMethod(method)
+        JavaMethodDsl(javaMethod, imports).apply(i)
+        x.methods.add(javaMethod)
+    }
+
+    fun constructor(i: JavaMethodDsl.() -> Unit) {
+        val javaMethod = JavaMethod(x.name)
         JavaMethodDsl(javaMethod, imports).apply(i)
         x.methods.add(javaMethod)
     }

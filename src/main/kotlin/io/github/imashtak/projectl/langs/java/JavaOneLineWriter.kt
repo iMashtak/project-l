@@ -152,8 +152,10 @@ internal class JavaOneLineWriter(
         if (x.default) {
             write("default ")
         }
-        write(x.returns)
-        write(" ")
+        if (x.returns != null) {
+            write(x.returns!!)
+            write(" ")
+        }
         write(x.name)
         write("(")
         var comma = false
