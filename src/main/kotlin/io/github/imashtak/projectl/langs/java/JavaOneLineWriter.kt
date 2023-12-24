@@ -18,14 +18,26 @@ internal class JavaOneLineWriter(
             write(import)
             write(";")
         }
-        for (clazz in x.classes) {
+        for (clazz in x.types) {
             write(clazz)
         }
     }
 
+    fun write(x: JavaType) {
+        when (x) {
+            is JavaClass -> write(x)
+            is JavaInterface -> write(x)
+            is JavaAnnotation -> write(x)
+            is JavaEnum -> write(x)
+        }
+    }
+
     fun write(x: JavaClass) {
+        for (annotation in x.annotations) {
+            write(annotation)
+        }
         write(x.visibility)
-        write(x.kind)
+        write("class ")
         write(x.name)
         write("{")
         for (field in x.fields) {
@@ -37,16 +49,72 @@ internal class JavaOneLineWriter(
         write("}")
     }
 
-    fun write(x: JavaKind) {
-        when (x) {
-            JavaKind.CLASS -> write("class ")
-            JavaKind.INTERFACE -> write("interface ")
-            JavaKind.ENUM -> write("enum ")
-            JavaKind.ANNOTATION -> write("@interface ")
+    fun write(x: JavaInterface) {
+        for (annotation in x.annotations) {
+            write(annotation)
         }
+        write(x.visibility)
+        write("interface ")
+        write(x.name)
+        write("{")
+        for (field in x.fields) {
+            write(field)
+        }
+        for (method in x.methods) {
+            write(method)
+        }
+        write("}")
+    }
+
+    fun write(x: JavaAnnotation) {
+        for (annotation in x.annotations) {
+            write(annotation)
+        }
+        write(x.visibility)
+        write("@interface ")
+        write(x.name)
+        write("{")
+        for (field in x.fields) {
+            write(field)
+        }
+        write("}")
+    }
+
+    fun write(x: JavaEnum) {
+        for (annotation in x.annotations) {
+            write(annotation)
+        }
+        write(x.visibility)
+        write("enum ")
+        write(x.name)
+        write("{")
+        for (value in x.values) {
+            write(value.name)
+            if (value.args.isNotEmpty()) {
+                write("(")
+                var comma = false
+                for (arg in value.args) {
+                    if (comma) write(",")
+                    write(arg.raw)
+                    comma = true
+                }
+                write(")")
+            }
+        }
+        write(";")
+        for (field in x.fields) {
+            write(field)
+        }
+        for (method in x.methods) {
+            write(method)
+        }
+        write("}")
     }
 
     fun write(x: JavaField) {
+        for (annotation in x.annotations) {
+            write(annotation)
+        }
         write(x.visibility)
         if (x.static) {
             write("static ")
@@ -54,11 +122,38 @@ internal class JavaOneLineWriter(
         write(x.type)
         write(" ")
         write(x.name)
+        if (x.initializer != null) {
+            write("=")
+            write(x.initializer!!)
+        }
+        write(";")
+    }
+
+    fun write(x: JavaAnnotationField) {
+        write(x.type)
+        write(" ")
+        write(x.name)
+        write("()")
+        if (x.default != null) {
+            write("default ")
+            write(x.default!!)
+        }
         write(";")
     }
 
     fun write(x: JavaMethod) {
+        for (annotation in x.annotations) {
+            write(annotation)
+        }
         write(x.visibility)
+        if (x.static) {
+            write("static ")
+        }
+        if (x.default) {
+            write("default ")
+        }
+        write(x.returns)
+        write(" ")
         write(x.name)
         write("(")
         var comma = false
@@ -72,6 +167,48 @@ internal class JavaOneLineWriter(
         write(")")
         if (x.body != null) {
             write(x.body!!)
+        } else {
+            write(";")
+        }
+    }
+
+    fun write(x: JavaAnnotationUsage) {
+        write("@" + x.name)
+        if (x.args.isEmpty()){
+            write(" ")
+            return
+        }
+        if (x.args.size == 1 && x.args[0].name == "value") {
+            val values = x.args[0].values
+            write("(")
+            writeAnnotationList(values)
+            write(")")
+        } else {
+            var comma = false
+            write("(")
+            for (arg in x.args) {
+                if (comma) write(",")
+                write(arg.name)
+                write("=")
+                writeAnnotationList(arg.values)
+                comma = true
+            }
+            write(")")
+        }
+    }
+
+    fun writeAnnotationList(values: MutableList<JavaExpression>) {
+        if (values.size == 1) {
+            write(values[0].raw)
+        } else {
+            var comma = false
+            write("{")
+            for (value in values) {
+                if (comma) write(",")
+                write(value.raw)
+                comma = true
+            }
+            write("}")
         }
     }
 

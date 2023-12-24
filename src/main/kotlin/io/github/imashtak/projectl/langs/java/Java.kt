@@ -34,6 +34,7 @@ class JavaFile : LangFile<JavaSettings> {
             val printer = JavaOneLineWriter(os, StandardCharsets.UTF_8)
             printer.write(def)
             val oneline = os.toString(StandardCharsets.UTF_8)
+            println(oneline)
             val formatterBuilder = JavaFormatterOptions.builder()
             if (settings.format == JavaFormatStyle.AOSP) {
                 formatterBuilder.style(JavaFormatterOptions.Style.AOSP)

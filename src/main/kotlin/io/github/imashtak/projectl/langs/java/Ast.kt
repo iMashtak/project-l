@@ -3,35 +3,72 @@ package io.github.imashtak.projectl.langs.java
 class JavaDefinition(
     var packageName: String = "",
     var imports: MutableSet<String> = HashSet(),
-    var classes: MutableList<JavaClass> = ArrayList()
+    var types: MutableList<JavaType> = ArrayList()
 )
+
+interface JavaType
 
 class JavaClass(
     val name: String,
-    val kind: JavaKind,
     var visibility: JavaVisibility = JavaVisibility.PUBLIC,
     var fields: MutableList<JavaField> = ArrayList(),
-    var methods: MutableList<JavaMethod> = ArrayList()
-)
+    var methods: MutableList<JavaMethod> = ArrayList(),
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
+): JavaType
 
-enum class JavaKind {
-    CLASS, INTERFACE, ENUM, ANNOTATION
-}
+class JavaInterface(
+    val name: String,
+    var visibility: JavaVisibility = JavaVisibility.PUBLIC,
+    var fields: MutableList<JavaField> = ArrayList(),
+    var methods: MutableList<JavaMethod> = ArrayList(),
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
+): JavaType
+
+class JavaAnnotation(
+    val name: String,
+    var visibility: JavaVisibility = JavaVisibility.PUBLIC,
+    var fields: MutableList<JavaAnnotationField> = ArrayList(),
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
+): JavaType
+
+class JavaEnum(
+    val name: String,
+    var visibility: JavaVisibility = JavaVisibility.PUBLIC,
+    var values: MutableList<JavaEnumValue> = ArrayList(),
+    var fields: MutableList<JavaField> = ArrayList(),
+    var methods: MutableList<JavaMethod> = ArrayList(),
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
+): JavaType
 
 class JavaField(
     val name: String,
     var visibility: JavaVisibility = JavaVisibility.PACKAGE_PRIVATE,
     var static: Boolean = false,
     var type: String = "Object",
-    var initializer: JavaExpression? = null
+    var initializer: JavaExpression? = null,
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
+)
+
+class JavaAnnotationField(
+    val name: String,
+    var type: String = "String",
+    var default: JavaExpression? = null
+)
+
+class JavaEnumValue(
+    val name: String,
+    val args: List<JavaExpression>
 )
 
 class JavaMethod(
     val name: String,
     var visibility: JavaVisibility = JavaVisibility.PACKAGE_PRIVATE,
     var static: Boolean = false,
+    var default: Boolean = false,
     var args: MutableList<JavaMethodArg> = ArrayList(),
-    var body: JavaBlockStatement? = null
+    var returns: String = "Object",
+    var body: JavaBlockStatement? = null,
+    var annotations: MutableList<JavaAnnotationUsage> = ArrayList()
 )
 
 class JavaMethodArg(
@@ -42,6 +79,16 @@ class JavaMethodArg(
 enum class JavaVisibility {
     PUBLIC, PRIVATE, PROTECTED, PACKAGE_PRIVATE
 }
+
+class JavaAnnotationUsage(
+    val name: String,
+    var args: MutableList<JavaAnnotationArg> = ArrayList()
+)
+
+class JavaAnnotationArg(
+    val name: String,
+    val values: MutableList<JavaExpression>
+)
 
 interface JavaStatement
 
