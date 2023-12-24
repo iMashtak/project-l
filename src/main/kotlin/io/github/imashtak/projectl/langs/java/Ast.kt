@@ -74,6 +74,48 @@ class JavaElseStatement(
     var body: JavaBlockStatement
 ): JavaStatement
 
+class JavaForStatement(
+    var starting: JavaExpression,
+    var condition: JavaExpression,
+    var ending: JavaExpression,
+    var body: JavaBlockStatement
+): JavaStatement
+
+class JavaForEachStatement(
+    var variable: String,
+    var collection: JavaExpression,
+    var body: JavaBlockStatement,
+    var variableType: String = "var",
+): JavaStatement
+
+class JavaWhileStatement(
+    var condition: String,
+    var body: JavaBlockStatement
+): JavaStatement
+
+class JavaSwitchStatement(
+    var obj: String,
+    var cases: MutableList<JavaSwitchCase> = ArrayList(),
+    var style: SwitchStyle = SwitchStyle.NEW
+): JavaStatement
+
+enum class SwitchStyle {
+    OLD, NEW
+}
+
+class JavaSwitchCase(
+    var match: String,
+    var body: JavaBlockStatement? = null
+)
+
+class JavaReturnStatement(
+    var expr: JavaExpression
+): JavaStatement
+
+class JavaBreakStatement : JavaStatement
+
+class JavaContinueStatement: JavaStatement
+
 class JavaExpression(
-    var expr: String
+    var raw: String
 )

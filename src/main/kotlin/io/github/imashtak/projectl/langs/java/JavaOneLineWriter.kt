@@ -83,6 +83,13 @@ internal class JavaOneLineWriter(
             is JavaIfStatement -> write(x)
             is JavaElseStatement -> write(x)
             is JavaElseIfStatement -> write(x)
+            is JavaForStatement -> write(x)
+            is JavaForEachStatement -> write(x)
+            is JavaWhileStatement -> write(x)
+            is JavaSwitchStatement -> write(x)
+            is JavaReturnStatement -> write(x)
+            is JavaBreakStatement -> write(x)
+            is JavaContinueStatement -> write(x)
         }
     }
 
@@ -100,6 +107,9 @@ internal class JavaOneLineWriter(
     }
 
     fun write(x: JavaVariableDeclarationStatement) {
+        if (x.final) {
+            write("final ")
+        }
         write(x.type)
         write(" ")
         write(x.name)
@@ -129,8 +139,76 @@ internal class JavaOneLineWriter(
         write(x.body)
     }
 
+    fun write(x: JavaForStatement) {
+        write("for(")
+        write(x.starting)
+        write(";")
+        write(x.condition)
+        write(";")
+        write(x.ending)
+        write(")")
+        write(x.body)
+    }
+
+    fun write(x: JavaForEachStatement) {
+        write("for(")
+        write(x.variableType)
+        write(" ")
+        write(x.variable)
+        write(":")
+        write(x.collection)
+        write(")")
+        write(x.body)
+    }
+
+    fun write(x: JavaWhileStatement) {
+        write("while(")
+        write(x.condition)
+        write(")")
+        write(x.body)
+    }
+
+    fun write(x: JavaSwitchStatement) {
+        write("switch(")
+        write(x.obj)
+        write("){")
+        for (case in x.cases) {
+            write(case, x.style)
+        }
+        write("}")
+    }
+
+    fun write(x: JavaSwitchCase, fashion: SwitchStyle) {
+        write("case ")
+        write(x.match)
+        when (fashion) {
+            SwitchStyle.NEW -> {
+                write("->")
+                write(x.body!!)
+            }
+            SwitchStyle.OLD -> {
+                write(":")
+                if (x.body != null) {
+                    write(x.body!!)
+                }
+            }
+        }
+    }
+
+    fun write(x: JavaReturnStatement) {
+        write("return ${x.expr.raw};")
+    }
+
+    fun write(x: JavaBreakStatement) {
+        write("break;")
+    }
+
+    fun write(x: JavaContinueStatement) {
+        write("continue;")
+    }
+
     fun write(x: JavaExpression) {
-        write(x.expr)
+        write(x.raw)
     }
 
     fun write(x: String) {

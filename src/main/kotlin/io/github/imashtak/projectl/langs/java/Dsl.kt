@@ -1,5 +1,7 @@
 package io.github.imashtak.projectl.langs.java
 
+import java.lang.RuntimeException
+
 @DslMarker
 annotation class JavaDslMarker
 
@@ -179,6 +181,63 @@ class JavaBlockStatementDsl(
         val statement = JavaElseIfStatement(JavaExpression(elseif), block)
         x.statements.add(statement)
     }
+
+    fun `for`(starting: String, condition: String, ending: String, i: JavaBlockStatementDsl.() -> Unit) {
+        val block = JavaBlockStatement()
+        JavaBlockStatementDsl(block, imports).apply(i)
+        val statement = JavaForStatement(
+            JavaExpression(starting),
+            JavaExpression(condition),
+            JavaExpression(ending),
+            block
+        )
+        x.statements.add(statement)
+    }
+
+    fun foreach(foreach: String, collection: String, i: JavaBlockStatementDsl.() -> Unit) {
+        val block = JavaBlockStatement()
+        JavaBlockStatementDsl(block, imports).apply(i)
+        val statement = JavaForEachStatement(
+            foreach, JavaExpression(collection), block
+        )
+        x.statements.add(statement)
+    }
+
+    fun foreach(foreach: String, type: String, collection: String, i: JavaBlockStatementDsl.() -> Unit) {
+        val block = JavaBlockStatement()
+        JavaBlockStatementDsl(block, imports).apply(i)
+        val statement = JavaForEachStatement(
+            foreach, JavaExpression(collection), block, type
+        )
+        x.statements.add(statement)
+    }
+
+    fun `while`(`while`: String, i: JavaBlockStatementDsl.() -> Unit) {
+        val block = JavaBlockStatement()
+        JavaBlockStatementDsl(block, imports).apply(i)
+        val statement = JavaWhileStatement(
+            `while`, block
+        )
+        x.statements.add(statement)
+    }
+
+    fun switch(switch: String, i: JavaSwitchStatementDsl.() -> Unit) {
+        val statement = JavaSwitchStatement(switch)
+        JavaSwitchStatementDsl(statement, imports).apply(i)
+        x.statements.add(statement)
+    }
+
+    fun `return`(`return`: String) {
+        x.statements.add(JavaReturnStatement(JavaExpression(`return`)))
+    }
+
+    fun `break`() {
+        x.statements.add(JavaBreakStatement())
+    }
+
+    fun `continue`() {
+        x.statements.add(JavaContinueStatement())
+    }
 }
 
 @JavaDslMarker
@@ -201,5 +260,29 @@ class JavaVariableDeclarationStatementDsl(
 
     fun expr(expr: String) {
         x.expression = JavaExpression(expr)
+    }
+}
+
+@JavaDslMarker
+class JavaSwitchStatementDsl(
+    private val x: JavaSwitchStatement,
+    private val imports: MutableSet<String>
+) {
+    fun oldStyle() {
+        x.style = SwitchStyle.OLD
+    }
+
+    fun case(case: String, i: (JavaBlockStatementDsl.() -> Unit)? = null) {
+        if (i == null && x.style == SwitchStyle.NEW) {
+            throw RuntimeException()
+        } else if (i == null) {
+            val javaCase = JavaSwitchCase(case)
+            x.cases.add(javaCase)
+        } else {
+            val block = JavaBlockStatement()
+            JavaBlockStatementDsl(block, imports).apply(i)
+            val javaCase = JavaSwitchCase(case, block)
+            x.cases.add(javaCase)
+        }
     }
 }
