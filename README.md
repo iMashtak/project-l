@@ -2,9 +2,18 @@
 
 ## Java
 
-- try/catch
-- synchronized
+### TODO
+
 - do/while
 - assert
 - generics
 - nested classes
+- static initializer
+- enums
+- modifiers
+
+## JSON
+
+- go through spec
+
+## JSON Schema
