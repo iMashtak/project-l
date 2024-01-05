@@ -17,5 +17,11 @@
             <artifactId>project-l-dsl-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-symbol-solver-core</artifactId>
+            <version>3.25.8</version>
+        </dependency>
     </dependencies>
 </project>

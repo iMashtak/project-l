@@ -1,8 +1,8 @@
-package io.github.imashtak.projectl
+package io.github.imashtak.projectl.dsl
 
 import java.io.OutputStream
 
-interface LangFile<Settings, AST> {
+interface LangSource<Settings, AST> {
 
     fun dump(out: OutputStream, settingsInitializer: Settings.() -> Unit = {})
 

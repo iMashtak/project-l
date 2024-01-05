@@ -1,12 +1,24 @@
-package io.github.imashtak.projectl.langs
+package io.github.imashtak.projectl.dsl.java
 
-import io.github.imashtak.projectl.dsl.java.java
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.lang.annotation.ElementType
 import java.lang.annotation.RetentionPolicy
 
-class JavaTest {
+class MainTest {
+
+    @Test
+    fun testJavaMethod() {
+        val result = javaMethod("test") {
+            annotation("TestAnnotation", "\"some\"")
+        }
+
+        val os = ByteArrayOutputStream()
+        result.dump(os)
+        val str = os.toString()
+
+        println(str)
+    }
 
     @Test
     fun testSimple() {

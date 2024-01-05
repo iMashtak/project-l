@@ -1,11 +1,10 @@
-package io.github.imashtak.projectl.langs
+package io.github.imashtak.projectl.dsl.json
 
-import io.github.imashtak.projectl.langs.json.json
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
-class JsonTest {
+class MainTest {
 
     @Test
     fun testSimple() {

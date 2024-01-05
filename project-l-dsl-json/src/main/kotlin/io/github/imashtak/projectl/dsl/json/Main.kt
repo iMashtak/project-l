@@ -1,30 +1,22 @@
-package io.github.imashtak.projectl.langs.json
+package io.github.imashtak.projectl.dsl.json
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
-import io.github.imashtak.projectl.LangFile
+import io.github.imashtak.projectl.dsl.LangSource
 import java.io.OutputStream
 
-data class JsonSettings(
-    var format: JsonFormatStyle = JsonFormatStyle.ONELINE
-)
+class JsonSettings
 
-enum class JsonFormatStyle {
-    ONELINE
+fun json(i: JsonDsl.() -> Unit): LangSource<JsonSettings, JsonNode> {
+    val dsl = JsonDsl().apply(i)
+    return JsonSource(dsl.root)
 }
 
-class JsonFile : LangFile<JsonSettings, JsonNode> {
-
-    private var root: JsonNode? = null
-
-    internal constructor(dsl: JsonDsl) {
-        this.root = dsl.root
-    }
+private class JsonSource(
+    private val root: JsonNode?
+) : LangSource<JsonSettings, JsonNode> {
 
     override fun dump(out: OutputStream, settingsInitializer: JsonSettings.() -> Unit) {
         val mapper = ObjectMapper()
@@ -34,72 +26,4 @@ class JsonFile : LangFile<JsonSettings, JsonNode> {
     override fun ast(): JsonNode {
         return root ?: NullNode.getInstance()
     }
-}
-
-@DslMarker
-annotation class JsonDslMarker
-
-@JsonDslMarker
-class JsonDsl {
-    internal var root: JsonNode? = null
-
-    fun text(text: String) {
-        if (root != null) throw RuntimeException()
-        root = TextNode(text)
-    }
-
-    fun obj(i: JsonObjectDsl.() -> Unit) {
-        if (root != null) throw RuntimeException()
-        root = ObjectNode(JsonNodeFactory.instance)
-        JsonObjectDsl(root as ObjectNode).apply(i)
-    }
-
-    fun array(i: JsonArrayDsl.() -> Unit) {
-        if (root != null) throw RuntimeException()
-        root = ArrayNode(JsonNodeFactory.instance)
-        JsonArrayDsl(root as ArrayNode).apply(i)
-    }
-}
-
-@JsonDslMarker
-class JsonObjectDsl(
-    private val node: ObjectNode
-) {
-    fun text(key: String, value: String) {
-        node.put(key, value)
-    }
-
-    fun int(key: String, value: Int) {
-        node.put(key, value)
-    }
-
-    fun obj(key: String, i: JsonObjectDsl.() -> Unit) {
-        val next = node.putObject(key)
-        JsonObjectDsl(next).apply(i)
-    }
-
-    fun array(key: String, i: JsonArrayDsl.() -> Unit) {
-        val next = node.putArray(key)
-        JsonArrayDsl(next).apply(i)
-    }
-}
-
-@JsonDslMarker
-class JsonArrayDsl(
-    private val node: ArrayNode
-) {
-    fun text(text: String) {
-        node.add(text)
-    }
-
-    fun obj(i: JsonObjectDsl.() -> Unit) {
-        val objNode = ObjectNode(JsonNodeFactory.instance)
-        JsonObjectDsl(objNode).apply(i)
-        node.add(objNode)
-    }
-}
-
-fun json(i: JsonDsl.() -> Unit): JsonFile {
-    val dsl = JsonDsl().apply(i)
-    return JsonFile(dsl)
 }
