@@ -1,7 +1,7 @@
 package io.github.imashtak.projectl.dsl.camel
 
 @CamelDslMarker
-class CamelNettyHttpDsl(private val it: CamelUriDsl) {
+class CamelNettyHttpUriDsl(private val it: CamelUriDsl) {
 
     init {
         it.component("netty-http")
@@ -40,6 +40,6 @@ class CamelNettyHttpDsl(private val it: CamelUriDsl) {
     }
 }
 
-fun CamelUriDsl.nettyHTTP(i: CamelNettyHttpDsl.() -> Unit) {
-    CamelNettyHttpDsl(this).apply(i)
+fun CamelUriDsl.nettyHTTP(i: CamelNettyHttpUriDsl.() -> Unit) {
+    CamelNettyHttpUriDsl(this).apply(i)
 }
