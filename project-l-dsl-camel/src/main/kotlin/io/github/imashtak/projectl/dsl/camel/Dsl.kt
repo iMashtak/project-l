@@ -2,8 +2,10 @@ package io.github.imashtak.projectl.dsl.camel
 
 import org.apache.camel.Expression
 import org.apache.camel.impl.DefaultCamelContext
+import org.apache.camel.model.DataFormatDefinition
 import org.apache.camel.model.RouteDefinition
 import org.apache.camel.model.app.RegistryBeanDefinition
+import org.apache.camel.model.dataformat.YAMLDataFormat
 import org.apache.camel.model.language.ConstantExpression
 import org.apache.camel.model.language.SimpleExpression
 
@@ -51,6 +53,11 @@ class CamelRouteDsl(
 class CamelRouteStepsDsl(
     private val x: RouteDefinition
 ) {
+
+    fun marshal(i: CamelDataFormatDsl.() -> Unit) {
+        val dsl = CamelDataFormatDsl().apply(i)
+        x.marshal(dsl.x)
+    }
 
     fun setHeader(setHeader: String, value: String) {
         x.setHeader(setHeader, ConstantExpression(value))
@@ -106,7 +113,14 @@ class CamelUriDsl {
 }
 
 @CamelDslMarker
+class CamelDataFormatDsl {
+
+    internal lateinit var x: DataFormatDefinition
+}
+
+@CamelDslMarker
 class CamelBeanDsl {
+
     internal val x: RegistryBeanDefinition = RegistryBeanDefinition()
 
     init {

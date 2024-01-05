@@ -29,6 +29,11 @@ class MainTest {
                             keepAlive(false)
                         }
                     }
+                    marshal {
+                        csv {
+                            delimiter(";")
+                        }
+                    }
                 }
             }
             bean {

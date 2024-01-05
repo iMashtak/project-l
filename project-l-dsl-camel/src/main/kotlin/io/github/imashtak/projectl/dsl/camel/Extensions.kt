@@ -1,5 +1,10 @@
 package io.github.imashtak.projectl.dsl.camel
 
+import org.apache.camel.model.dataformat.CsvDataFormat
+import org.apache.camel.model.dataformat.YAMLDataFormat
+
+// --- Endpoint DSL ---
+
 @CamelDslMarker
 class CamelNettyHttpUriDsl(private val it: CamelUriDsl) {
 
@@ -42,4 +47,33 @@ class CamelNettyHttpUriDsl(private val it: CamelUriDsl) {
 
 fun CamelUriDsl.nettyHTTP(i: CamelNettyHttpUriDsl.() -> Unit) {
     CamelNettyHttpUriDsl(this).apply(i)
+}
+
+// --- DataFormat DSL ---
+
+// ---- YAML ----
+
+@CamelDslMarker
+class CamelDataFormatYamlDsl {
+    internal val x: YAMLDataFormat = YAMLDataFormat()
+}
+
+fun CamelDataFormatDsl.yaml(i: CamelDataFormatYamlDsl.() -> Unit) {
+    x = CamelDataFormatYamlDsl().apply(i).x
+}
+
+// ---- CSV ----
+
+@CamelDslMarker
+class CamelDataFormatCsvDsl {
+
+    internal val x: CsvDataFormat = CsvDataFormat()
+
+    fun delimiter(delimiter: String) {
+        x.delimiter = delimiter
+    }
+}
+
+fun CamelDataFormatDsl.csv(i: CamelDataFormatCsvDsl.() -> Unit) {
+    x = CamelDataFormatCsvDsl().apply(i).x
 }
