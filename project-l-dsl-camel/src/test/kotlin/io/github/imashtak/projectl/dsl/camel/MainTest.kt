@@ -34,6 +34,19 @@ class MainTest {
                             delimiter(";")
                         }
                     }
+                    choice {
+                        `when`(constant("true") and constant("false")) {
+                            setHeader("My-Header", "some")
+                            setHeader("My-Another-Header", "another")
+                        }
+                        `when`({ simple("false") }) {}
+                        otherwise {
+                            to {
+                                component("mock")
+                                url("test2")
+                            }
+                        }
+                    }
                 }
             }
             bean {

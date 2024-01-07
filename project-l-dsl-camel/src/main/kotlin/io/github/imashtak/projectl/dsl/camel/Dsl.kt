@@ -1,12 +1,18 @@
 package io.github.imashtak.projectl.dsl.camel
 
 import org.apache.camel.Expression
+import org.apache.camel.Predicate
+import org.apache.camel.builder.PredicateBuilder
+import org.apache.camel.builder.ValueBuilder
 import org.apache.camel.impl.DefaultCamelContext
+import org.apache.camel.model.ChoiceDefinition
 import org.apache.camel.model.DataFormatDefinition
+import org.apache.camel.model.ProcessorDefinition
 import org.apache.camel.model.RouteDefinition
 import org.apache.camel.model.app.RegistryBeanDefinition
 import org.apache.camel.model.dataformat.YAMLDataFormat
 import org.apache.camel.model.language.ConstantExpression
+import org.apache.camel.model.language.HeaderExpression
 import org.apache.camel.model.language.SimpleExpression
 
 @DslMarker
@@ -51,8 +57,14 @@ class CamelRouteDsl(
 
 @CamelDslMarker
 class CamelRouteStepsDsl(
-    private val x: RouteDefinition
+    private val x: ProcessorDefinition<*>
 ) {
+
+    fun choice(i: CamelChoiceDsl.() -> Unit) {
+        val def = x.choice()
+        CamelChoiceDsl(def).apply(i)
+        def.end()
+    }
 
     fun marshal(i: CamelDataFormatDsl.() -> Unit) {
         val dsl = CamelDataFormatDsl().apply(i)
@@ -60,7 +72,7 @@ class CamelRouteStepsDsl(
     }
 
     fun setHeader(setHeader: String, value: String) {
-        x.setHeader(setHeader, ConstantExpression(value))
+        x.setHeader(setHeader, constant(value))
     }
 
     fun setHeader(setHeader: String, expr: Expression) {
@@ -71,6 +83,34 @@ class CamelRouteStepsDsl(
         val dsl = CamelUriDsl().apply(i)
         val uri = dsl.toUri()
         x.to(uri)
+    }
+}
+
+@CamelDslMarker
+class CamelChoiceDsl(
+    private val x: ChoiceDefinition
+) {
+
+    fun `when`(`when`: Predicate, i: CamelRouteStepsDsl.() -> Unit) {
+        val def = x.`when`(`when`)
+        CamelRouteStepsDsl(def).apply(i)
+        def.endChoice()
+    }
+
+    fun `when`(whenSupplier: () -> Predicate, i: CamelRouteStepsDsl.() -> Unit) {
+        val def = x.`when`(whenSupplier())
+        CamelRouteStepsDsl(def).apply(i)
+        def.endChoice()
+    }
+
+    fun otherwise(i: CamelRouteStepsDsl.() -> Unit) {
+        val def = x.otherwise()
+        CamelRouteStepsDsl(def).apply(i)
+        def.endChoice()
+    }
+
+    fun precondition() {
+        x.precondition()
     }
 }
 
@@ -140,10 +180,22 @@ class CamelBeanDsl {
     }
 }
 
-fun constant(constant: String): Expression {
-    return ConstantExpression(constant)
+fun constant(constant: String): ValueBuilder {
+    return ValueBuilder(ConstantExpression(constant))
 }
 
-fun simple(simple: String): Expression {
-    return SimpleExpression(simple)
+fun simple(simple: String): ValueBuilder {
+    return ValueBuilder(SimpleExpression(simple))
+}
+
+fun not(not: ValueBuilder) {
+    not.not()
+}
+
+infix fun Predicate.and(and: Predicate): Predicate {
+    return PredicateBuilder.and(this, and)
+}
+
+fun and(vararg and: Predicate): Predicate {
+    return PredicateBuilder.and(*and)
 }
