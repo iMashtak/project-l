@@ -180,6 +180,18 @@ class CamelBeanDsl {
     }
 }
 
+fun expression(expression: Expression): ValueBuilder {
+    return ValueBuilder(expression)
+}
+
+fun header(header: String): ValueBuilder {
+    return ValueBuilder(HeaderExpression(header))
+}
+
+fun body(): ValueBuilder {
+    return ValueBuilder(simple("\${body}"))
+}
+
 fun constant(constant: String): ValueBuilder {
     return ValueBuilder(ConstantExpression(constant))
 }

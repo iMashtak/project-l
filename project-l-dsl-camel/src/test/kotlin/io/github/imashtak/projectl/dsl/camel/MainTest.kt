@@ -39,7 +39,7 @@ class MainTest {
                             setHeader("My-Header", "some")
                             setHeader("My-Another-Header", "another")
                         }
-                        `when`({ simple("false") }) {}
+                        `when`({ body().contains("arg") and constant("true") }) {}
                         otherwise {
                             to {
                                 component("mock")
