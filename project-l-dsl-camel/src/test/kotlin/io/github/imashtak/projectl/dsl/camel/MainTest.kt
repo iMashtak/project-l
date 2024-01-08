@@ -39,7 +39,12 @@ class MainTest {
                             setHeader("My-Header", "some")
                             setHeader("My-Another-Header", "another")
                         }
-                        `when`({ body().contains("arg") and constant("true") }) {}
+                        `when`({
+                            val arg = "arg"
+                            body().contains(arg) and constant("true")
+                        }) {
+                            setHeader("Not-My-Header", "third")
+                        }
                         otherwise {
                             to {
                                 component("mock")
